@@ -29,7 +29,7 @@
 			#chrome {
 				position: relative;
 			}
-			#chrome > img {
+			#chrome > svg {
 				position: absolute;
 				width: 100%;
 				height: 100%;
@@ -40,7 +40,9 @@
 		<div class="button" id="spin">Spin</div>
 		<div class="button" id="flash">Flash</div>
 		<div id="chrome">
-			<img src="images/drawing.svg?c">
+			<?php include 'images/drawing.svg" ?>
+			<!--
+			<img src="images/drawing.svg?d">
 			<ul id="sensors">
 				<li class="green n1"><a></a></li>
 				<li class="green n2"><a></a></li>
@@ -67,6 +69,7 @@
 				<li class="blue n2"><a></a></li>
 				<li class="blue n3"><a></a></li>
 			</ul>
+			-->
 		</div>
 	</body>
 </html>
