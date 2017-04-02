@@ -10,8 +10,8 @@ jQuery(function($) {
 			'Y': 'G',
 		}
 		speed = 1000/3,
-		spinning, next = 'G',
-		flashing, on = true;
+		spinning=0, next = 'G',
+		flashing=0, on = true;
 	
 	var set = function(x, y) {
 		sensors.css('background-position', x+'px '+y+'px');
