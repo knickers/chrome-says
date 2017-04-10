@@ -8,6 +8,8 @@
 		<script type="text/javascript" src="main.js"></script>
 		<title>Chrome Says</title>
 		<style>
+			* { box-sizing: border-box; }
+			body { margin: 0; padding: 0; }
 			#buttons {
 				position: absolute;
 			}
@@ -18,6 +20,8 @@
 				width: 100%;
 				max-width: 100%;
 				max-height: 100%;
+				width: 450px;
+				height: 450px
 			}
 		</style>
 	</head>

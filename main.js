@@ -1,34 +1,86 @@
+var resizeChromeLogo = function() {
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	if (width < height) {
+		$('#chrome_logo').css({
+			'width': width+'px',
+			'height': width+'px'
+		});
+	} else {
+		$('#chrome_logo').css({
+			'width': height+'px',
+			'height': height+'px'
+		});
+	}
+};
+
 jQuery(function($) {
-	var R = $('#path_red'),
-		B = $('#path_blue'),
-		G = $('#path_green'),
-		Y = $('#path_yellow'),
-		sensors = $('#svg_sensors'),
-		sequence = {
-			'G': 'R',
-			'R': 'Y',
-			'Y': 'G',
-		}
-		speed = 1000/3,
-		spinning=0, next = 'G',
-		flashing=0, on = true;
+	resizeChromeLogo();
 	
-	var set = function(x, y) {
-		sensors.css('background-position', x+'px '+y+'px');
+	var group_red = $('#group_red'),
+		group_green = $('#group_green'),
+		group_blue = $('#group_blue'),
+		group_yellow = $('#group_yellow'),
+		A = $('#group_red, #group_blue, #group_green, #group_yellow'),
+		sequence = {
+			'group_green': 'group_red',
+			'group_red': 'group_yellow',
+			'group_yellow': 'group_green'
+		},
+		states = {
+			'group_red': {
+				'release': {'x': 0.25, 'y': -0.75},
+				'press': {'x': 0, 'y': 0},
+				'light': {'x': 0, 'y': 0}
+			},
+			'group_green': {
+				'release': {'x': -1, 'y': 0},
+				'press': {'x': 0, 'y': 0},
+				'light': {'x': 0, 'y': 0}
+			},
+			'group_blue': {
+				'release': {'x': 2, 'y': 1, 'q': 1, 'w': 1},
+				'press': {'x': 0, 'y': 0, 'q': 0, 'w': 0},
+				'light': {'x': 0, 'y': 0, 'q': 0, 'w': 0}
+			},
+			'group_yellow': {
+				'release': {'x': 0.5, 'y': 0.5},
+				'press': {'x': 0, 'y': 0},
+				'light': {'x': 0, 'y': 0}
+			}
+		},
+		speed = 1000/3,
+		spinning = 0, next = 'group_green',
+		flashing = 0, on = true;
+	
+	var move = function(e, x, y) {
+		e.attr('transform', 'translate('+x+', '+y+')');
+	};
+	var scale = function(e, x, y) {
+		e.attr('transform', 'translate(-'+x/2+', -'+y/2+') scale(1.0'+x+', 1.0'+y+')');
 	};
 	
-	R	.mouseenter(function() { set(-1280,   0); })
-		.mousedown( function() { set(-1280,-610); });
-	B	.mouseenter(function() { set(-2560,   0); })
-		.mousedown( function() { set(-2560,-610); });
-	G	.mouseenter(function() { set(-640 ,   0); })
-		.mousedown( function() { set(-640 ,-610); });
-	Y	.mouseenter(function() { set(-1920,   0); })
-		.mousedown( function() { set(-1920,-610); });
+	var transform = function(id, e) {
+		if ('x' in states[id][e] && 'y' in states[id][e]) {
+			move(eval(id), states[id][e].x, states[id][e].y);
+		}
+		if ('q' in states[id][e] && 'w' in states[id][e]) {
+			scale(eval(id), states[id][e].q, states[id][e].w);
+		}
+	};
 	
-	$('path, ellipse')
-		.mouseleave(function() { set(0, 0); })
-		.mouseup(function() { $(this).mouseenter(); });
+	var release = function() {
+		transform(this.id, 'release');
+	};
+	var light = function() {
+		transform(this.id, 'light');
+	};
+	var press = function() {
+		transform(this.id, 'press');
+	};
+	
+	A.mousedown(press).mouseup(release).mouseenter(light).mouseleave(release);
+	A.mouseleave();
 	
 	var spin = function() {
 		eval(next).mouseleave();
@@ -40,7 +92,7 @@ jQuery(function($) {
 		var self = $(this);
 		if (self.hasClass('active')) {
 			clearInterval(spinning);
-			set(0, 0);
+			A.mouseleave();
 		} else {
 			spin();
 			spinning = setInterval(spin, speed);
@@ -49,7 +101,11 @@ jQuery(function($) {
 	});
 
 	var flash = function() {
-		set(0, on ? -610 : 0);
+		if (on) {
+			A.mouseenter();
+		} else {
+			A.mouseleave();
+		}
 		on = !on;
 	};
 
@@ -57,7 +113,7 @@ jQuery(function($) {
 		var self = $(this);
 		if (self.hasClass('active')) {
 			clearInterval(flashing);
-			set(0, 0);
+			A.mouseleave();
 		} else {
 			flash();
 			flashing = setInterval(flash, speed);
